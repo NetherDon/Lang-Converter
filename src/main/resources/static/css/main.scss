@@ -1,0 +1,424 @@
+$main: rgb(255, 0, 60);
+$main-dark: rgb(133, 0, 31);
+
+$bg: rgb(18, 18, 18);
+$bg-light: rgb(31, 31, 31);
+
+@mixin disable-text-selection()
+{
+    -moz-user-select: none; 
+    -webkit-user-select: none; 
+    -ms-user-select:none; 
+    user-select:none;
+    -o-user-select:none;
+}
+
+@mixin default-slider($bg, $bg-hover)
+{
+    &::-webkit-scrollbar
+    {
+        width: 0.5em;
+        height: 0.5em;
+
+        &:disabled
+        {
+            width: 0;
+            height: 0;
+        }
+    }
+
+    &::-webkit-scrollbar-corner
+    {
+        display: none;
+    }
+
+    &::-webkit-scrollbar-thumb 
+    {
+        background: $bg;
+
+        &:hover
+        {
+            background: $bg-hover;
+        }
+    }
+}
+
+@mixin init-button()
+{
+    background: $main;
+    color: white;
+    border: 0;
+    transition: background-color 0.25s ease;
+    font-size: 15;
+
+    &:hover
+    {
+        background: $main-dark;
+    }
+
+    &:disabled
+    {
+        background: $main-dark;
+        color: gray;
+        transition: none;
+    }
+}
+
+* 
+{
+    font-family: arial black, sans-serif;
+}
+
+.title
+{
+    font-size: 50;
+    color: white;
+    border-bottom: 2px solid $main;
+    background: linear-gradient(0deg, $bg-light 0%, transparent 100%);;
+}
+
+.global-bg-panel
+{
+    background: linear-gradient(0deg, rgb(15, 15, 15) 0%, $bg 50%);
+    display: block;
+    margin-left: 100;
+    margin-right: 100;
+}
+
+.text-bg 
+{
+    margin-top: 50;
+    margin-left: 0;
+    margin-right: 0;
+    background: $bg-light;
+    height: 600;
+    padding: 20;
+
+    box-shadow: 0px 13px 10px -8px rgba(0, 0, 0, 0.5);
+}
+
+table.text-table
+{
+    width: 100%;
+    height: 100%;
+
+    tr
+    {
+        > td
+        {
+            padding: 2;
+            margin: 0;
+
+            &:nth-of-type(1)
+            {
+                width: 200;
+            }
+        }
+
+        &:nth-of-type(1)
+        {
+            > td:nth-of-type(2)
+            {
+                width: 5;
+            }
+        }
+
+        &:nth-of-type(-n+3)
+        {
+            height: 35;
+        }
+    }
+}
+
+div.file-view
+{
+    display: grid;
+    grid-template-rows: min-content auto; 
+    background: $bg;
+    border: 1px solid $main;
+    
+    width: 100%;
+    height: 100%;
+}
+
+.toolbar
+{
+    display: flex;
+    gap: 5px;
+    height: 100%;
+
+    .button
+    {
+        min-width: auto;
+    }
+}
+
+.toolbar-button
+{
+    width: 50;
+    height: 50;
+    @include init-button();
+}
+
+div.code-box
+{
+    background: $bg;
+    border: 1px solid $main;
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    overflow: scroll;
+
+    padding: 0;
+
+    @include default-slider($main-dark, $main);
+
+    > table
+    {
+        display: table;
+        border-spacing: 0;
+        min-width: 100%;
+        max-width: fit-content;
+        width: fit-content;
+        min-height: 0px;
+        height: 100%;
+
+        .orders
+        {
+            background: $bg;
+            vertical-align: top;
+            padding: 0;
+            margin: 0;
+
+            min-width: 30px;
+            border-right: 2px solid $main-dark;
+
+            position: sticky;
+            left: 0;
+            z-index: 2;
+
+            > div
+            {
+                color: lightgray;
+                text-align: right;
+
+                margin-top: 1;
+                margin-right: 0;
+                margin-left: 5;
+                padding-right: 5;
+
+                line-height: 1.5;
+                font-size: 13;
+
+                > span
+                {
+                    padding: 2px;
+                    font-family: courier;
+
+                    &.error
+                    {
+                        border: 1px solid red;
+                        background: rgb(80, 0, 0);
+                        border-radius: 10px;
+                        color: lightgray;
+                    }
+                }
+            }
+            
+        }
+
+        .code-text
+        {
+            margin-left: 10;
+
+            > div
+            {
+                min-height: 0px;
+                min-width: 0px;
+
+                > pre
+                {
+                    outline: none;
+                    background: none;
+
+                    padding: 0;
+                    margin: 0;
+
+                    line-height: 1.5;
+                    font-size: 13;
+                    
+                    *
+                    {
+                        font-family: courier;
+                    }
+                }
+            }
+        }
+    }
+}
+
+#error-box-row
+{
+    height: 25%;
+}
+
+.code-text-edit
+{
+    background: transparent;
+    //border: 1px solid darkgreen;
+    border: none;
+    white-space: nowrap;
+    resize: none;
+    overflow: hidden;
+
+    tab-size: 31.25px;
+
+    min-width: 100%;
+    min-height: 95%;
+    margin: 0;
+
+    color: white;
+    outline: none;
+    line-height: 1.5;
+    font-size: 13;
+    padding-top: 0;
+    padding-left: 10;
+    padding-right: 5;
+    *, & {
+        font-family: courier;
+    }
+}
+
+.error-box
+{
+    display: grid;
+    width: 100%;
+    height: 100%;
+    background: $bg;
+    border: 1px solid $main;
+    overflow: scroll;
+
+    padding: 10px;
+    color: white;
+    font-family: courier;
+    font-size: 13;
+
+    outline: none;
+
+    @include default-slider($main-dark, $main);
+}
+
+.button
+{
+    width: 100%;
+    height: 100%;
+    @include init-button();
+}
+
+.file-input
+{
+    display: block;
+    height: 100%;
+
+    > label
+    {
+        display: block;
+        background: $main;
+        height: 100%;
+        width: 100%;
+        cursor: pointer;
+        text-align: center;
+
+        @include init-button();
+
+        span
+        {
+            display: inline-flex;
+            position: relative;
+            color: white;
+            align-items: center;
+            width: fit-content;
+            height: 100%;
+            overflow: hidden;
+
+            @include disable-text-selection();
+        }
+
+        input[type="file"]
+        {
+            position: absolute;
+            top: -10000px;
+        }
+    }
+}
+
+custom-option
+{
+    display: block;
+    color: white;
+
+    &:--disabled
+    {
+        color: gray;
+    }
+
+    &:--hidden
+    {
+        display: none;
+    }
+}
+
+#lang-select-message
+{
+    color: gray;
+    display: block;
+}
+
+div.lang-select
+{
+    height: 100%;
+    background: $bg;
+    border: 1px solid $main;
+    overflow-y: scroll;
+    @include default-slider($main-dark, $main);
+
+    & > div
+    {
+        padding: 10;
+        & > custom-select
+        {
+            font-size: 15;
+            color: white;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+
+            & > custom-option
+            {
+                padding: 2;
+                transition: background 0.25s ease;
+                @include disable-text-selection();
+
+                &:nth-of-type(1)
+                {
+                    margin-bottom: 20;
+                    border-bottom: 1px solid $main;
+                }
+                
+                &:not(:--disabled)
+                {
+                    &:hover, &:--selected
+                    {
+                        background: $main;
+                    }
+                }
+
+                &:focus
+                {
+                    background: $main;
+                }
+            }
+        }
+    }
+}

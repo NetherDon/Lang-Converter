@@ -1,0 +1,1 @@
+"C:\Program Files\Java\jdk-20\bin\java.exe" %1.%1

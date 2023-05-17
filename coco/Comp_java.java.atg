@@ -1,0 +1,126 @@
+COMPILER Comp_java
+CHARACTERS
+  letter = 'A'..'Z'+'a'..'z'.
+  digit = '0'..'9'.
+  cr  = '\r'.  lf  = '\n'.  tab = '\t'.
+TOKENS
+  ident  = letter {letter | digit}.
+  number = digit {digit}.
+IGNORE cr + lf + tab
+PRODUCTIONS
+Comp_java =
+   {Comm}
+   "import" "java.util.*" ';'
+"class" Ident
+   "{"
+      {GlobDecl ';' }
+      {ProcDecl  }   /*  ????????? Main() */
+   "}"
+.
+GlobDecl =
+   "static" Type
+      Ident
+      ["=" ("true"|"false"|number)]
+      { ',' Ident
+         ["=" ("true"|"false"|number)]
+   }
+.
+ProcDecl =
+   "public" "static" "void" Ident
+    ("(String[]" "args)" | "()")
+ "{"
+   [ {VarDecl ';'}
+   ]
+   [ StatSeq ]
+   [ "Scanner" "in" "=" "new" "Scanner(System.in);"
+      "String" "ss" "=" "in.nextLine();"
+   ]
+ "}"
+.
+VarDecl =
+   { Type
+     Ident
+     { ',' Ident
+  }
+   }
+.
+Type =
+   ("int"
+   |"boolean"
+   )
+.
+Comm  =
+      "/*" { ANY
+          }
+      "*/"
+.
+StatSeq =    {Comm}Stat        {
+         {Comm} Stat  } [Comm]
+.
+Stat  =
+   "System.out.println"
+   "(" Expr ")"   ';'
+   | Ident
+      [( "=" Expr ';'
+         |
+         "()"   ';'            // ????? ?????????
+        )
+      ]
+   |   "if" "(" Expr ")" "{"
+         StatSeq
+      "}"
+      [ "else"
+         { "if" "(" Expr ")" "{"
+            StatSeq
+            "}" "else"
+         }
+      "{"
+         StatSeq
+       "}"
+      ]
+   | "while" "(" Expr ")" "{"
+      StatSeq
+      "}"
+.
+Expr   =
+   SimpleExpr [RelOp SimpleExpr]
+.
+SimpleExpr   =
+   ['+' | '-'
+   ]
+   Term
+   {
+      AddOp Term
+   }
+.
+Term    =
+   Factor
+   {MulOp Factor
+   }
+.
+Factor
+   =
+   (Ident | number)
+   | '(' Expr ')'
+   | '!' Factor
+   | "true"
+   | "false"
+.
+RelOp  =
+   "=="
+   | "!="
+   | ('<' | "<=" | '>' | ">=")
+.
+AddOp    =
+      ('+' | '-' )
+      | "||"
+.
+MulOp    =
+      '*'
+      | "/"
+      | "%"
+      | "&&"
+.
+Ident = ident
+.
+END Comp_java.

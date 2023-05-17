@@ -1,0 +1,5 @@
+	var a,b,c
+	a = 10;
+	b = 5*a + 1
+	c  = 2 *(a+b)
+	print c 
