@@ -1,101 +1,156 @@
 package ru.langconvert.langconvert;
 
-import java.io.File;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import javax.print.DocFlavor.STRING;
+import java.util.List;
+import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartRequest;
 
-import ru.langconvert.langconvert.FileUtils.FileName;
+import ru.langconvert.langconvert.converters.ConversionResult;
+import ru.langconvert.langconvert.converters.ConverterModel;
+import ru.langconvert.langconvert.converters.ConverterRepository;
+import ru.langconvert.langconvert.converters.Message;
+import ru.langconvert.langconvert.html.FileExtensionResponse;
+import ru.langconvert.langconvert.html.LanguageNameResponse;
+import ru.langconvert.langconvert.html.components.MainPageBuilder;
+import ru.langconvert.langconvert.languages.LanguageModel;
+import ru.langconvert.langconvert.languages.LanguageRepository;
 
 @Controller
-@SuppressWarnings("unused")
 public class MainController 
 {
     public static final Logger LOGGER = LoggerFactory.getLogger("main");
+    
+    @Autowired
+    private LanguageRepository langRepo;
+    @Autowired
+    private ConverterRepository convRepo;
+
+    private <A, ID> List<A> allToList(CrudRepository<A, ID> repo)
+    {
+        List<A> models = new ArrayList<>();
+
+        var iter = repo.findAll().iterator();
+        while (iter.hasNext())
+        {
+            models.add(iter.next());
+        }
+
+        return models;
+    }
 
     @GetMapping("/")
-    public String initData(ModelMap model)
+    public String testMainPage(ModelMap model)
     {
-        model.put("lang_selector_values", Languages.createHTMLSelectorValues());
-        model.put("prism_scripts", Languages.createHTMLPrismImport());
-        model.put(
-            "lang_extensions", 
-            String.join(
-                ", ", 
-                Arrays.stream(Languages.getAll())
-                    .map((lang) -> "." + lang.fileExtension)
-                    .toArray((size) -> new String[size])
-            )
-        );
+        String table = MainPageBuilder.createTable(this.allToList(this.langRepo).toArray(new LanguageModel[0]));
+        model.put("files_table", table);
         return "index";
     }
 
-    @PostMapping("/converter")
-    public ResponseEntity<?> convertToLanguage(@RequestParam("file") MultipartFile file, @RequestParam("requiredLanguageId") String requiredLanguage)
+    @GetMapping("/languages")
+    public ResponseEntity<Collection<LanguageModel>> getLanguages()
     {
-        ResponseEntity.BodyBuilder errResponse = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR);
-
-        Language language1 = Languages.getByFileName(file.getOriginalFilename());
-        if (language1 == null)
-            return errResponse.body("Unknown language of file");
-        
-        Language language2 = Languages.getByID(requiredLanguage);
-        if (language2 == null)
-            return errResponse.body("Unknown required language \"" + requiredLanguage + "\"");
-        
-        FileName name = FileUtils.splitName(file.getOriginalFilename());
-
-        try
-        {
-            String fileContent = new String(file.getBytes());
-
-            String resultFileName = name.path + "." + language2.fileExtension;
-            
-            String resultFileContent = String.format("\"%s\" converted to \"%s\"\n\n", language1.name, language2.name);
-            LOGGER.info("File size: " + fileContent.length());
-            for (int i = fileContent.length()-1; i >= 0; i--)
-            {
-                resultFileContent += fileContent.charAt(i);
-            }
-            
-            FileData fileData = new FileData(language2, resultFileName, resultFileContent);
-            return ResponseEntity.ok(fileData);
-        }
-        catch (IOException ioException)
-        {
-            ioException.printStackTrace();
-            return errResponse.body("Can't read file");
-        }
+        return ResponseEntity.ok(this.allToList(this.langRepo));
     }
 
-    @GetMapping("/lang")
-    public @ResponseBody ResponseEntity<FileLangInfo> getLangDataByExtension(FileExtensionData data)
+    @GetMapping("/languages/extension-by-name")
+    public ResponseEntity<FileExtensionResponse> getExtensionByLanguageName(@RequestParam("lang") String languageName)
     {
-        LOGGER.info(data.toString());
-        Language lang = Languages.getByExtension(data.getExtension());
-        if (lang == null)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        return ResponseEntity.ok(new FileLangInfo(lang));
+        return this.langRepo.findExtensionByName(languageName)
+            .map(FileExtensionResponse::new)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/languages/name-by-extension")
+    public ResponseEntity<LanguageNameResponse> getLanguageNameByExtension(@RequestParam("ext") String fileExtension)
+    {
+        return this.langRepo.findNameByExtension(fileExtension)
+            .map(LanguageNameResponse::new)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/converters")
+    public ResponseEntity<Collection<ConverterModel>> getConverters()
+    {
+        return ResponseEntity.ok(this.allToList(this.convRepo));
+    }
+
+    @GetMapping("/conversion")
+    public ResponseEntity<ConversionResult> convert(String text, @RequestParam("input") String inputLanguageName, @RequestParam("output") String outputLanguageName)
+    {
+        if (inputLanguageName.equals(outputLanguageName))
+        {
+            ConversionResult result = new ConversionResult();
+            result.setType(ConversionResult.Type.SAME_LANGUAGE);
+            result.setText(text);
+            return ResponseEntity.ok(result);
+        }
+
+        Optional<LanguageModel> langIn = this.langRepo.findByName(inputLanguageName);
+        if (!langIn.isPresent())
+        {
+            ConversionResult result = new ConversionResult();
+            result.setType(ConversionResult.Type.CONVERTER_NOT_FOUND);
+            result.errors().add(new Message("Unknown language name \"" + inputLanguageName + "\""));
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        Optional<LanguageModel> langOut = this.langRepo.findByName(outputLanguageName);
+        if (!langOut.isPresent())
+        {
+            ConversionResult result = new ConversionResult();
+            result.setType(ConversionResult.Type.CONVERTER_NOT_FOUND);
+            result.errors().add(new Message("Unknown language name \"" + outputLanguageName + "\""));
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        Optional<ConverterModel> converter = this.convRepo.findByLanguages(langIn.get(), langOut.get());
+        if (!converter.isPresent())
+        {
+            ConversionResult result = new ConversionResult();
+            result.setType(ConversionResult.Type.CONVERTER_NOT_FOUND);
+            result.setErrors(
+                List.of(
+                    new Message(
+                        String.format(
+                            "Перевод кода с %s на %s не поддерживается или временно недоступен", 
+                            langIn.get().displayName(), 
+                            langOut.get().displayName()
+                        )
+                    )
+                )
+            );
+            return ResponseEntity.ok(result);
+        }
+
+        try 
+        {
+            ConversionResult result = converter.get().convert(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)));
+            return ResponseEntity.ok(result);
+        } 
+        catch (
+            ClassNotFoundException | NoSuchMethodException | SecurityException
+                | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException | IOException e
+        ) 
+        {
+            e.printStackTrace();
+        }
+        
+        return ResponseEntity.internalServerError().build();
     }
 }

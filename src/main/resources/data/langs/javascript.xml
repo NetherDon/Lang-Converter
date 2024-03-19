@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<language 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="schema/language.xsd"
->   
-    <name>JavaScript</name>
-    <editor>https://www.jdoodle.com/execute-spidermonkey-online/</editor>
-    <extension>js</extension>
-</language>
