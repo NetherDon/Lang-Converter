@@ -4,10 +4,13 @@ $(document).ready(() =>
     El.fileInput.change(ButtonEvents.input.fileInputChanged);
     El.btns.downloadInput.click(ButtonEvents.input.downloadTextClicked);
     El.btns.convert.click(ButtonEvents.input.convertClicked);
+    El.btns.copyInput.click(ButtonEvents.input.copyClicked);
+    El.btns.openInputWebCompiler.click(ButtonEvents.input.openCompiler);
     El.inputSelector.change(ButtonEvents.input.languageChanged);
 
     El.btns.downloadOutput.click(ButtonEvents.output.downloadTextClicked);
-    El.btns.copy.click(ButtonEvents.output.copyClicked);
+    El.btns.copyOutput.click(ButtonEvents.output.copyClicked);
+    El.btns.openOutputWebCompiler.click(ButtonEvents.output.openCompiler);
 
     El.outputText.change(TextEvents.output.textChanged);
 

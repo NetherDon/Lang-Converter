@@ -37,5 +37,17 @@ const Requests = {
             success: data.success,
             error: data.error
         });
+    },
+
+    getCompilerById(data)
+    {
+        $.ajax({
+            url: "/languages/compiler-by-name",
+            method: "get",
+            dataType: "text",
+            data: { "lang": data.languageId },
+            success: data.success,
+            error: data.error
+        });
     }
 };

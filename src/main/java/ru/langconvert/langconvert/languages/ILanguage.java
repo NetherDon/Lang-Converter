@@ -4,5 +4,6 @@ public interface ILanguage
 {
     public String name();
     public String displayName();
-    public String fileExtension();    
+    public String fileExtension();
+    public String compilerUrl();    
 }

@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS language (
     name VARCHAR(255) UNIQUE NOT NULL,
     display_name VARCHAR(255) NOT NULL,
     file_extension VARCHAR(63) NOT NULL,
+    web_compiler_url VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 );
 

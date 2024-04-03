@@ -32,6 +32,8 @@ public class InputColumn implements IFileColumn
                 <input id="load-file-btn" type="button" value="Загрузить">
                 <input id="load-file-input" type="file">
                 <input id="download-input-btn" type="button" value="Скачать">
+                <input id="copy-input-btn" type="button" value="Копировать">
+                <input id="open-compiler-input-btn" type="button" value="Проверить">
             </div>
         """;
     }

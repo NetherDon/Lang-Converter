@@ -145,6 +145,30 @@ const ButtonEvents = {
                 text: El.inputText.textarea.val(),
                 name: "input_code"
             });
+        },
+
+        copyClicked()
+        {
+            var text = El.inputText.textarea.val();
+            if (text != "" && typeof text == 'string')
+            {
+                navigator.clipboard.writeText(text);
+            }
+        },
+
+        openCompiler()
+        {
+            Requests.getCompilerById({
+                languageId: El.inputSelector.val(),
+                success(data)
+                {
+                    var json = JSON.parse(data);
+                    if (json.url)
+                    {
+                        window.open(json.url, "_blank").focus();
+                    }
+                }
+            });
         }
     },
 
@@ -165,6 +189,21 @@ const ButtonEvents = {
             {
                 navigator.clipboard.writeText(text);
             }
+        },
+
+        openCompiler()
+        {
+            Requests.getCompilerById({
+                languageId: El.outputSelector.val(),
+                success(data)
+                {
+                    var json = JSON.parse(data);
+                    if (json.url)
+                    {
+                        window.open(json.url, "_blank").focus();
+                    }
+                }
+            });
         }
     },
 

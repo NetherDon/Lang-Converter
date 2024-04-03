@@ -27,9 +27,10 @@ public class OutputColumn implements IFileColumn
     public String createButtons() 
     {
         return """
-            <div class=\"button-table-line grid-two-columns\">
+            <div class=\"button-table-line grid-three-columns\">
                 <input id=\"download-output-btn\" type=\"button\" value=\"Скачать\" disabled>
                 <input id=\"copy-output-btn\" type=\"button\" value=\"Копировать\" disabled>
+                <input id="open-compiler-output-btn" type="button" value="Проверить">
             </div>
         """;
     }

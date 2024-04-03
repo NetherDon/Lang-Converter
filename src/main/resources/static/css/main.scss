@@ -1,6 +1,7 @@
 $main-bg-color: #031137;
 $second-bg-color: #1d2c56;
 $decor-color: rgb(247, 132, 0);
+$decor-color-hover: rgb(170, 91, 0);
 
 html
 {
@@ -118,6 +119,7 @@ html
         &:hover
         {
             background: rgb(170, 91, 0);
+            color: lightgray;
         }
 
         &:disabled
@@ -271,5 +273,50 @@ html
             overflow: auto;
             text-wrap: wrap;
         }
+    }
+}
+
+#links-bg
+{
+    display: grid;
+    row-gap: 10px;
+    column-gap: 5px;
+    grid-template-columns: repeat(2, auto);
+
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+    box-sizing: border-box;
+    background: $second-bg-color;
+    border-radius: 10px;
+    padding: 20px;
+
+    > a
+    {
+        color: lightgray;
+        padding: 10px;
+        //text-align: center;
+
+        &:hover
+        {
+            color: gray;
+        }
+    }
+}
+
+#conv-gen-download-btn
+{
+    color: white !important;
+    text-align: center;
+    text-decoration: none;
+    background: $decor-color;
+    border-radius: 10px;
+    padding: 10px;
+
+    &:hover
+    {
+        background: $decor-color-hover;
+        color: lightgray !important;
     }
 }

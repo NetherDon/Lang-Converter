@@ -63,7 +63,7 @@ const TextEvents = {
         {
             var flag = event.target.innerText == '';
             El.btns.downloadOutput.get(0).disabled = flag;
-            El.btns.copy.get(0).disabled = flag;
+            El.btns.copyOutput.get(0).disabled = flag;
         }
     }
 };

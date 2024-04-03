@@ -8,9 +8,12 @@ const El = {
         get convert() { return $('#convert-btn'); },
         get loadFile() { return $('#load-file-btn'); },
         get downloadInput() { return $('#download-input-btn'); },
+        get copyInput() { return $('#copy-input-btn'); },
+        get openInputWebCompiler() { return $('#open-compiler-input-btn'); },
         
         get downloadOutput() { return $('#download-output-btn'); },
-        get copy() { return $('#copy-output-btn'); },
+        get copyOutput() { return $('#copy-output-btn'); },
+        get openOutputWebCompiler() { return $('#open-compiler-output-btn'); },
 
         get showMessage() { return $('#show-message-btn'); }
     },

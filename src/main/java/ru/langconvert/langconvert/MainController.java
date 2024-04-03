@@ -24,6 +24,7 @@ import ru.langconvert.langconvert.converters.ConverterModel;
 import ru.langconvert.langconvert.converters.ConverterRepository;
 import ru.langconvert.langconvert.converters.Message;
 import ru.langconvert.langconvert.html.FileExtensionResponse;
+import ru.langconvert.langconvert.html.LanguageCompilerResponse;
 import ru.langconvert.langconvert.html.LanguageNameResponse;
 import ru.langconvert.langconvert.html.components.MainPageBuilder;
 import ru.langconvert.langconvert.languages.LanguageModel;
@@ -80,6 +81,15 @@ public class MainController
     {
         return this.langRepo.findNameByExtension(fileExtension)
             .map(LanguageNameResponse::new)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/languages/compiler-by-name")
+    public ResponseEntity<LanguageCompilerResponse> getCompilerUlrByLanguageName(@RequestParam("lang") String languageName)
+    {
+        return this.langRepo.findCompilerByName(languageName)
+            .map(LanguageCompilerResponse::new)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }

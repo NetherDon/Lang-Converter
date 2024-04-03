@@ -35,4 +35,9 @@
             <pre id="message-text">Random text second line</pre>
         </div>
     </div>
+    <div id="links-bg">
+        <a id="conv-gen-btn" href="https://github.com/NetherDon/Lang-Converter-Gen" target="_blank">Генератор конвертеров</a>
+        <a id="conv-gen-download-btn" href="https://github.com/NetherDon/Lang-Converter-Gen/releases/latest/download/ConverterGen.jar" target="_blank">Скачать</a>
+        <a id="app-code-btn" href="https://github.com/NetherDon/Lang-Converter" target="_blank">Исходный код приложения</a>
+    </div>
 </body>
