@@ -17,6 +17,12 @@ const TextEvents = {
             this.highlitedTextArea.text(this.textarea.value);
         },
 
+        textChanged(e)
+        {
+            TextEvents.input.highlightText();
+            LS.sourceCodeText.set(e.target.value);
+        },
+
         onTextareaKeyDown(event)
         {
             if (event.keyCode == 9)

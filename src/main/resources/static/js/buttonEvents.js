@@ -1,13 +1,31 @@
 const ButtonEvents = {
+    common: {
+        showMessageBox()
+        {
+            El.messageBox.bg.show();
+        },
+        
+        closeMessageBox()
+        {
+            El.messageBox.bg.hide();
+        }
+    },
     input: {
         languageChanged(event)
         {
             TextEvents.input.highlightText();
+            LS.sourceLanguage.set(El.inputSelector.val());
         },
 
         loadFileButtonClicked(event)
         {
             El.fileInput.get(0)?.click();
+        },
+
+        clearCode(event)
+        {
+            El.inputText.textarea.val("");
+            El.inputText.textarea.trigger("input");
         },
 
         fileInputChanged(event)
@@ -35,10 +53,11 @@ const ButtonEvents = {
                         var json = JSON.parse(data);
                         El.inputSelector.val(json.name);
                         El.inputSelector.trigger("change");
+                        El.inputText.textarea.trigger('input');
                     },
                     error(data)
                     {
-                        El.inputText.textarea.trigger('change');
+                        El.inputText.textarea.trigger('input');
                     }
                 });
             }
@@ -48,6 +67,8 @@ const ButtonEvents = {
         {
             var outLangId = El.outputSelector.val();
             event.target.disabled = true;
+
+            ButtonEvents.common.closeMessageBox();
 
             Requests.convert({
                 text: El.inputText.textarea.val(),
@@ -87,11 +108,11 @@ const ButtonEvents = {
                         if (message.row > 0)
                         {
                             var a = document.createElement('a');
-                            var row = message.row - 1;
+                            var row = message.row;
                             var column = Math.max(0, message.column - 1);
 
                             a.innerText = row.toString() + "," + column;
-                            a.href = `javascript:setCursor(${row}, ${column})`;
+                            a.href = `javascript:setCursor(${row-1}, ${column})`;
                             a.draggable = false;
 
                             El.messageBox.text.append(document.createTextNode(" ("));
@@ -118,6 +139,7 @@ const ButtonEvents = {
                     if (json.errors.length > 0 || json.warnings.length > 0)
                     {
                         El.btns.showMessage.show();
+                        ButtonEvents.common.showMessageBox();
                     }
                     else
                     {
@@ -138,9 +160,9 @@ const ButtonEvents = {
             });
         },
 
-        downloadTextClicked()
+        saveTextClicked()
         {
-            ButtonEvents.__downloadFile({
+            ButtonEvents.__saveToFile({
                 languageId: El.inputSelector.val(),
                 text: El.inputText.textarea.val(),
                 name: "input_code"
@@ -173,9 +195,14 @@ const ButtonEvents = {
     },
 
     output: {
-        downloadTextClicked()
+        languageChanged(event)
         {
-            ButtonEvents.__downloadFile({
+            LS.targetLanguage.set(El.outputSelector.val());
+        },
+
+        saveTextClicked()
+        {
+            ButtonEvents.__saveToFile({
                 languageId: El.outputText.attr("lang"),
                 text: El.outputText.text(),
                 name: "output_code"
@@ -207,27 +234,26 @@ const ButtonEvents = {
         }
     },
 
-    __downloadFile(data)
+    async __saveToFile(data)
     {
-        function download(ext)
+        async function save(ext)
         {
-            var file = new File([data.text], `${data.name}.${ext}`);
-
-            const link = document.createElement('a')
-            const url = URL.createObjectURL(file)
-
-            link.href = url
-            link.download = file.name
-            document.body.appendChild(link)
-            link.click()
-
-            document.body.removeChild(link)
-            window.URL.revokeObjectURL(url)
+            var fileHandle = await window.showSaveFilePicker({
+                suggestedName: `${data.name}.${ext}`
+            });
+            if (fileHandle.kind !== 'file')
+            {
+                return;
+            }
+    
+            var writable = await fileHandle.createWritable();
+            writable.write(data.text);
+            writable.close();
         }
 
         if (typeof data.languageId == "undefined")
         {
-            download("txt");
+            save("txt");
             return;
         }
 
@@ -236,11 +262,11 @@ const ButtonEvents = {
             success(data)
             {
                 var json = JSON.parse(data);
-                download(json.extension);
+                save(json.extension);
             },
             error(data)
             {
-                download("txt");
+                save("txt");
             }
         });
     }

@@ -3,7 +3,6 @@
 <head>
     <!--Prism-->
     <script src="https://unpkg.com/prismjs@1.29.0/prism.js"></script>
-    <script src="https://unpkg.com/prismjs@1.29.0/components/prism-c.js"></script>
     <script src="https://unpkg.com/prismjs@1.29.0/plugins/normalize-whitespace/prism-normalize-whitespace.js"></script>
     <link href="https://unpkg.com/prismjs@1.29.0/themes/prism-funky.css" rel="stylesheet" />
 
@@ -26,7 +25,7 @@
     <meta charset="utf-8">
 </head>
 <body style="padding: auto 20px;">
-    <p class="title">Конвертер языков программирования</p>
+    <p class="title">Конвертер кода</p>
     ${files_table}
     <div id="message-bg" style="display: none;">
         <div id="message-panel">

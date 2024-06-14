@@ -54,7 +54,7 @@ public class MainController
     }
 
     @GetMapping("/")
-    public String testMainPage(ModelMap model)
+    public String mainPage(ModelMap model)
     {
         String table = MainPageBuilder.createTable(this.allToList(this.langRepo).toArray(new LanguageModel[0]));
         model.put("files_table", table);
@@ -86,7 +86,7 @@ public class MainController
     }
 
     @GetMapping("/languages/compiler-by-name")
-    public ResponseEntity<LanguageCompilerResponse> getCompilerUlrByLanguageName(@RequestParam("lang") String languageName)
+    public ResponseEntity<LanguageCompilerResponse> getCompilerUrlByLanguageName(@RequestParam("lang") String languageName)
     {
         return this.langRepo.findCompilerByName(languageName)
             .map(LanguageCompilerResponse::new)

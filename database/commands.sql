@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS language (
 
 CREATE TABLE IF NOT EXISTS converter ( 
     id SERIAL,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) UNIQUE NOT NULL,
     avaliable BOOLEAN NOT NULL,
     lang_in_id INT NOT NULL,
     lang_out_id INT NOT NULL,
@@ -21,16 +21,14 @@ CREATE TABLE IF NOT EXISTS converter (
     FOREIGN KEY (lang_out_id) REFERENCES language(id)
 );
 
-INSERT INTO language (name, display_name, file_extension, web_compiler_url) VALUES 
-('java', 'Java', 'java', 'https://www.onlinegdb.com/online_java_compiler'),
-('csharp', 'C#', 'cs', 'https://www.onlinegdb.com/online_csharp_compiler'),
-('python', 'Python', 'py', 'https://www.onlinegdb.com/online_python_compiler');
-
-INSERT INTO converter (name, avaliable, lang_in_id, lang_out_id, file_name, package) VALUES
-('cstojava', true, (SELECT id FROM language WHERE name = 'csharp'), (SELECT id FROM language WHERE name = 'java'), 'cstojava', 'cstojava');
-
 SELECT * FROM language;
 SELECT * FROM converter;
+
+SELECT id, name, lang_in_name, lang_out_name, file_name, package FROM converter 
+LEFT JOIN (SELECT id as lang_in_id, name as lang_in_name FROM language) as n1 
+ON converter.lang_in_id = n1.lang_in_id
+LEFT JOIN (SELECT id as lang_out_id, name as lang_out_name FROM language) as n2
+ON converter.lang_out_id = n2.lang_out_id;
 
 SELECT name FROM language WHERE file_extension = 'cs';
 SELECT * FROM converter WHERE lang_in_id = 2 AND lang_out_id = 1;

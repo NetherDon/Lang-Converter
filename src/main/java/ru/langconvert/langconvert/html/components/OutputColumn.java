@@ -28,7 +28,7 @@ public class OutputColumn implements IFileColumn
     {
         return """
             <div class=\"button-table-line grid-three-columns\">
-                <input id=\"download-output-btn\" type=\"button\" value=\"Скачать\" disabled>
+                <input id=\"download-output-btn\" type=\"button\" value=\"Сохранить\" disabled>
                 <input id=\"copy-output-btn\" type=\"button\" value=\"Копировать\" disabled>
                 <input id="open-compiler-output-btn" type="button" value="Проверить">
             </div>
